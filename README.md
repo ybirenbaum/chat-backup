@@ -82,12 +82,30 @@ npm run dev
 Open http://localhost:3000, sign in with Google, and upload a WhatsApp
 chat export ZIP (Export chat → "Include media" from any WhatsApp chat).
 
-## 6. Deploy
+## 6. Deploy to GitHub Pages
 
-Any Next.js host works (Vercel, Firebase App Hosting, etc.) — just set the
-same environment variables there. If you deploy to a new domain, add it
-under **Authentication → Settings → Authorized domains** in the Firebase
-console, or Google sign-in will be rejected.
+This repo is set up to deploy automatically to GitHub Pages:
+
+1. In the repo's **Settings → Pages**, set **Source** to **GitHub Actions**
+   (one-time setup).
+2. Push to `main` — `.github/workflows/deploy.yml` builds a static export
+   (`output: "export"` in `next.config.ts`) using the config baked into
+   `.env.production`, and publishes it to Pages.
+3. Add your Pages URL (e.g. `https://<you>.github.io`) to **Authentication
+   → Settings → Authorized domains** in the Firebase console, or Google
+   sign-in will fail there.
+
+`.env.production` contains the same kind of public client identifiers as
+`.env.local` (see above) — not secrets — which is why it's committed and
+usable directly by CI with no extra secrets setup. If you change Firebase
+or Cloudinary projects, update both `.env.local` (for local dev) and
+`.env.production` (for the deployed site).
+
+Any other static host (Vercel, Netlify, Firebase App Hosting, etc.) also
+works — just run a normal `next build` (without `GITHUB_PAGES=true`, so
+`basePath` stays empty) and set the same environment variables there. As
+with GitHub Pages, add whatever domain you deploy to under Firebase's
+Authorized domains.
 
 ## How it works
 
