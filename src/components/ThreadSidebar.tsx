@@ -35,7 +35,7 @@ export default function ThreadSidebar({
             messageCount: data.messageCount ?? 0,
             mediaCount: data.mediaCount ?? 0,
             skippedMediaCount: data.skippedMediaCount ?? 0,
-            messagesPath: data.messagesPath,
+            messagesUrl: data.messagesUrl,
           };
         })
       );
