@@ -23,5 +23,5 @@ export interface ThreadMeta {
   messageCount: number;
   mediaCount: number;
   skippedMediaCount: number;
-  messagesPath: string; // storage path to messages.json
+  messagesUrl: string; // Cloudinary URL to messages.json
 }

@@ -1,7 +1,7 @@
 import JSZip from "jszip";
-import { ref, uploadBytes, getDownloadURL, uploadString } from "firebase/storage";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { storage, db } from "./firebase";
+import { db } from "./firebase";
+import { uploadToCloudinary, resourceTypeForKind } from "./cloudinary";
 import {
   parseChatText,
   extractAttachmentFileName,
@@ -68,7 +68,7 @@ export async function uploadWhatsAppZip(
 
   const maxBytes = maxMediaMb * 1024 * 1024;
   const threadId = crypto.randomUUID();
-  const basePath = `users/${uid}/threads/${threadId}`;
+  const folder = `chat-backup/${uid}/${threadId}`;
 
   const uniqueFileNames = new Set<string>();
   for (const line of parsedLines) {
@@ -97,10 +97,15 @@ export async function uploadWhatsAppZip(
       continue;
     }
 
-    const storageRef = ref(storage, `${basePath}/media/${basename(entry.name)}`);
-    await uploadBytes(storageRef, blob, { contentType: blob.type || undefined });
-    const url = await getDownloadURL(storageRef);
-    mediaUrlByName.set(lowerName, { url, size: blob.size });
+    const fileName = basename(entry.name);
+    const resourceType = resourceTypeForKind(detectMediaKind(fileName));
+    const { url, bytes } = await uploadToCloudinary(
+      blob,
+      fileName,
+      resourceType,
+      `${folder}/media`
+    );
+    mediaUrlByName.set(lowerName, { url, size: bytes });
     mediaDone += 1;
   }
 
@@ -130,11 +135,15 @@ export async function uploadWhatsAppZip(
     };
   });
 
-  const messagesPath = `${basePath}/messages.json`;
-  const messagesRef = ref(storage, messagesPath);
-  await uploadString(messagesRef, JSON.stringify(messages), "raw", {
-    contentType: "application/json",
+  const messagesBlob = new Blob([JSON.stringify(messages)], {
+    type: "application/json",
   });
+  const { url: messagesUrl } = await uploadToCloudinary(
+    messagesBlob,
+    "messages.json",
+    "raw",
+    folder
+  );
 
   await addDoc(collection(db, "users", uid, "threads"), {
     name: threadName,
@@ -143,7 +152,7 @@ export async function uploadWhatsAppZip(
     messageCount: messages.length,
     mediaCount: mediaUrlByName.size,
     skippedMediaCount,
-    messagesPath,
+    messagesUrl,
   });
 
   onProgress({ stage: "done", mediaDone, mediaTotal });

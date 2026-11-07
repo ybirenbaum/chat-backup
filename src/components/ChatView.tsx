@@ -26,7 +26,7 @@ export default function ChatView({ threadId }: { threadId: string }) {
         if (cancelled) return;
         setThreadName(data.name);
 
-        const res = await fetch(data.messagesPath.startsWith("http") ? data.messagesPath : await resolveDownloadUrl(data.messagesPath));
+        const res = await fetch(data.messagesUrl);
         const json: ChatMessage[] = await res.json();
         if (!cancelled) setMessages(json);
       } catch (e) {
@@ -81,12 +81,4 @@ export default function ChatView({ threadId }: { threadId: string }) {
       </div>
     </div>
   );
-}
-
-// messagesPath is stored as a gs:// storage path; resolve it to an https
-// download URL lazily (keeps the Firestore doc free of long-lived URLs).
-async function resolveDownloadUrl(path: string): Promise<string> {
-  const { ref, getDownloadURL } = await import("firebase/storage");
-  const { storage } = await import("@/lib/firebase");
-  return getDownloadURL(ref(storage, path));
 }
