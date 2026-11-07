@@ -11,8 +11,11 @@ export default function ShareIconButton({
     <button
       onClick={onClick}
       title="Share"
-      className={`rounded-full p-1 text-neutral-400 transition hover:bg-neutral-200 hover:text-neutral-700 dark:hover:bg-neutral-700 dark:hover:text-neutral-100 ${
-        alwaysVisible ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+      className={`flex-shrink-0 rounded-full p-1 text-neutral-400 transition hover:bg-neutral-200 hover:text-neutral-700 dark:hover:bg-neutral-700 dark:hover:text-neutral-100 ${
+        // :hover never fires on touch devices, so the icon must default to
+        // visible below the sm breakpoint and only hide-until-hover on
+        // pointer-fine (desktop) screens.
+        alwaysVisible ? "opacity-100" : "opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
       }`}
     >
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

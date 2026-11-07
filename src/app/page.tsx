@@ -31,26 +31,40 @@ export default function Home() {
 
   return (
     <div className="flex h-screen w-full overflow-hidden">
-      <ThreadSidebar selectedId={selectedThread} onSelect={selectThread} />
-      {selectedThread ? (
-        viewMode === "dashboard" ? (
-          <ThreadDashboard
-            key={selectedThread}
-            threadId={selectedThread}
-            onOpenMessages={() => setViewMode("messages")}
-          />
+      <ThreadSidebar
+        selectedId={selectedThread}
+        onSelect={selectThread}
+        hiddenOnMobile={selectedThread !== null}
+      />
+      {/* On mobile, the sidebar acts as a full-screen chat list; this pane
+          only shows once a chat is selected, with a back button to return to
+          it. On md+ screens both are shown side by side as usual. */}
+      <div
+        className={`${
+          selectedThread ? "flex" : "hidden md:flex"
+        } h-screen flex-1 flex-col overflow-hidden`}
+      >
+        {selectedThread ? (
+          viewMode === "dashboard" ? (
+            <ThreadDashboard
+              key={selectedThread}
+              threadId={selectedThread}
+              onOpenMessages={() => setViewMode("messages")}
+              onBackToList={() => setSelectedThread(null)}
+            />
+          ) : (
+            <ChatView
+              key={selectedThread}
+              threadId={selectedThread}
+              onBack={() => setViewMode("dashboard")}
+            />
+          )
         ) : (
-          <ChatView
-            key={selectedThread}
-            threadId={selectedThread}
-            onBack={() => setViewMode("dashboard")}
-          />
-        )
-      ) : (
-        <div className="flex flex-1 items-center justify-center bg-neutral-100 text-sm text-neutral-400 dark:bg-neutral-950">
-          Select a chat, or upload a new WhatsApp export ZIP to get started.
-        </div>
-      )}
+          <div className="flex flex-1 items-center justify-center bg-neutral-100 text-sm text-neutral-400 dark:bg-neutral-950">
+            Select a chat, or upload a new WhatsApp export ZIP to get started.
+          </div>
+        )}
+      </div>
     </div>
   );
 }

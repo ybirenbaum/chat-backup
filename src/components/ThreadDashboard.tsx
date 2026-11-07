@@ -12,9 +12,11 @@ import ShareControl from "./ShareControl";
 export default function ThreadDashboard({
   threadId,
   onOpenMessages,
+  onBackToList,
 }: {
   threadId: string;
   onOpenMessages: () => void;
+  onBackToList?: () => void;
 }) {
   const { user } = useAuth();
   const { thread, messages, error } = useThread(threadId);
@@ -22,14 +24,14 @@ export default function ThreadDashboard({
 
   if (error) {
     return (
-      <div className="flex h-screen flex-1 items-center justify-center bg-neutral-100 dark:bg-neutral-950">
+      <div className="flex h-full flex-1 items-center justify-center bg-neutral-100 dark:bg-neutral-950">
         <p className="text-sm text-red-500">{error}</p>
       </div>
     );
   }
   if (!thread || !messages) {
     return (
-      <div className="flex h-screen flex-1 items-center justify-center bg-neutral-100 dark:bg-neutral-950">
+      <div className="flex h-full flex-1 items-center justify-center bg-neutral-100 dark:bg-neutral-950">
         <p className="text-sm text-neutral-400">Loading summary…</p>
       </div>
     );
@@ -40,17 +42,30 @@ export default function ThreadDashboard({
   const maxCount = topParticipants[0]?.count ?? 1;
 
   return (
-    <div className="flex h-screen flex-1 flex-col overflow-y-auto bg-neutral-100 dark:bg-neutral-950">
-      <div className="flex items-center justify-between gap-3 border-b border-neutral-200 bg-white px-6 py-4 dark:border-neutral-800 dark:bg-neutral-900">
-        <div className="min-w-0">
-          <h2 className="truncate text-lg font-semibold text-neutral-900 dark:text-neutral-100">
-            {thread.name}
-          </h2>
-          <p className="text-xs text-neutral-400">
-            {thread.participants.length} participants · {stats.messageCount} messages
-          </p>
+    <div className="flex h-full flex-1 flex-col overflow-y-auto bg-neutral-100 dark:bg-neutral-950">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-neutral-200 bg-white px-4 py-3 dark:border-neutral-800 dark:bg-neutral-900 sm:px-6 sm:py-4">
+        <div className="flex min-w-0 flex-1 items-center gap-2">
+          {onBackToList && (
+            <button
+              onClick={onBackToList}
+              title="Back to chats"
+              className="flex-shrink-0 rounded-md p-1.5 text-neutral-500 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-800 md:hidden"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+            </button>
+          )}
+          <div className="min-w-0 flex-1">
+            <h2 className="truncate text-base font-semibold text-neutral-900 dark:text-neutral-100 sm:text-lg">
+              {thread.name}
+            </h2>
+            <p className="text-xs text-neutral-400">
+              {thread.participants.length} participants · {stats.messageCount} messages
+            </p>
+          </div>
         </div>
-        <div className="flex flex-shrink-0 items-center gap-2">
+        <div className="flex w-full flex-wrap items-center justify-end gap-2 sm:w-auto sm:flex-nowrap">
           {user && <ShareControl uid={user.uid} thread={thread} />}
           <button
             onClick={onOpenMessages}
@@ -61,8 +76,8 @@ export default function ThreadDashboard({
         </div>
       </div>
 
-      <div className="mx-auto w-full max-w-5xl flex-1 space-y-6 p-6">
-        <section className="rounded-xl bg-white p-5 shadow-sm dark:bg-neutral-900">
+      <div className="mx-auto w-full max-w-5xl flex-1 space-y-4 p-4 sm:space-y-6 sm:p-6">
+        <section className="rounded-xl bg-white p-4 shadow-sm sm:p-5 dark:bg-neutral-900">
           <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-neutral-400">
             Summary
           </h3>
@@ -125,7 +140,7 @@ export default function ThreadDashboard({
         </section>
 
         {stats.recent.length > 0 && (
-          <section className="rounded-xl bg-white p-5 shadow-sm dark:bg-neutral-900">
+          <section className="rounded-xl bg-white p-4 shadow-sm sm:p-5 dark:bg-neutral-900">
             <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-neutral-400">
               ✨ Highlights
             </h3>
@@ -164,7 +179,7 @@ export default function ThreadDashboard({
           </section>
         )}
 
-        <section className="rounded-xl bg-white p-5 shadow-sm dark:bg-neutral-900">
+        <section className="rounded-xl bg-white p-4 shadow-sm sm:p-5 dark:bg-neutral-900">
           <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-neutral-400">
             📷 Photos ({stats.photos.length})
           </h3>
@@ -186,7 +201,7 @@ export default function ThreadDashboard({
           )}
         </section>
 
-        <section className="rounded-xl bg-white p-5 shadow-sm dark:bg-neutral-900">
+        <section className="rounded-xl bg-white p-4 shadow-sm sm:p-5 dark:bg-neutral-900">
           <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-neutral-400">
             🎬 Videos & audio ({stats.videosAndAudio.length})
           </h3>

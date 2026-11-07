@@ -10,9 +10,11 @@ import UploadButton from "./UploadButton";
 export default function ThreadSidebar({
   selectedId,
   onSelect,
+  hiddenOnMobile = false,
 }: {
   selectedId: string | null;
   onSelect: (id: string) => void;
+  hiddenOnMobile?: boolean;
 }) {
   const { user, signOut } = useAuth();
   const [threads, setThreads] = useState<ThreadMeta[]>([]);
@@ -44,7 +46,11 @@ export default function ThreadSidebar({
   }, [user]);
 
   return (
-    <aside className="flex h-screen w-72 flex-shrink-0 flex-col border-r border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900">
+    <aside
+      className={`${
+        hiddenOnMobile ? "hidden md:flex" : "flex"
+      } h-screen w-full flex-shrink-0 flex-col border-r border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900 md:w-72`}
+    >
       <div className="flex items-center justify-between border-b border-neutral-200 p-4 dark:border-neutral-800">
         <div className="flex items-center gap-2">
           {user?.photoURL && (
