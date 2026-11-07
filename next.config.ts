@@ -10,6 +10,11 @@ const nextConfig: NextConfig = {
   trailingSlash: true,
   basePath: isGithubPages ? `/${repoName}` : "",
   assetPrefix: isGithubPages ? `/${repoName}/` : "",
+  env: {
+    // Lets client code build absolute share links that include the base
+    // path, since basePath itself isn't readable at runtime.
+    NEXT_PUBLIC_BASE_PATH: isGithubPages ? `/${repoName}` : "",
+  },
   turbopack: {
     rules: {
       "*.css": {

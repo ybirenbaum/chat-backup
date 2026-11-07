@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import type { ChatMessage } from "@/lib/types";
+import { shareMedia, shareText } from "@/lib/shareMedia";
+import ShareIconButton from "./ShareIconButton";
 
 function formatTime(iso: string | null, raw: string): string {
   if (!iso) return raw;
@@ -13,62 +15,6 @@ function formatTime(iso: string | null, raw: string): string {
     hour: "2-digit",
     minute: "2-digit",
   });
-}
-
-async function shareMedia(url: string, fileName: string, text: string) {
-  try {
-    const res = await fetch(url);
-    const blob = await res.blob();
-    const file = new File([blob], fileName, { type: blob.type });
-
-    if (navigator.canShare?.({ files: [file] })) {
-      await navigator.share({ files: [file], text });
-      return;
-    }
-    if (navigator.share) {
-      await navigator.share({ url, text });
-      return;
-    }
-  } catch {
-    // fall through to download
-  }
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = fileName;
-  a.target = "_blank";
-  a.rel = "noopener noreferrer";
-  a.click();
-}
-
-async function shareText(text: string, sender: string | null) {
-  const payload = sender ? `${sender}: ${text}` : text;
-  try {
-    if (navigator.share) {
-      await navigator.share({ text: payload });
-      return;
-    }
-  } catch {
-    // fall through to clipboard
-  }
-  await navigator.clipboard?.writeText(payload);
-}
-
-function ShareButton({ onClick }: { onClick: () => void }) {
-  return (
-    <button
-      onClick={onClick}
-      title="Share"
-      className="rounded-full p-1 text-neutral-400 opacity-0 transition group-hover:opacity-100 hover:bg-neutral-200 hover:text-neutral-700 dark:hover:bg-neutral-700 dark:hover:text-neutral-100"
-    >
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-        <circle cx="18" cy="5" r="3" />
-        <circle cx="6" cy="12" r="3" />
-        <circle cx="18" cy="19" r="3" />
-        <line x1="8.6" y1="10.6" x2="15.4" y2="6.4" />
-        <line x1="8.6" y1="13.4" x2="15.4" y2="17.6" />
-      </svg>
-    </button>
-  );
 }
 
 export default function MessageBubble({ message }: { message: ChatMessage }) {
@@ -107,7 +53,7 @@ export default function MessageBubble({ message }: { message: ChatMessage }) {
                 className="max-h-72 max-w-xs cursor-pointer rounded-md object-cover"
               />
               <div className="absolute right-1 top-1">
-                <ShareButton
+                <ShareIconButton
                   onClick={() =>
                     shareMedia(message.media!.url, message.media!.fileName, "")
                   }
@@ -142,7 +88,7 @@ export default function MessageBubble({ message }: { message: ChatMessage }) {
           {message.media.kind === "audio" && (
             <div className="flex items-center gap-2">
               <audio src={message.media.url} controls className="h-10 max-w-xs" />
-              <ShareButton
+              <ShareIconButton
                 onClick={() =>
                   shareMedia(message.media!.url, message.media!.fileName, "")
                 }
@@ -159,7 +105,7 @@ export default function MessageBubble({ message }: { message: ChatMessage }) {
               >
                 📎 {message.media.fileName}
               </a>
-              <ShareButton
+              <ShareIconButton
                 onClick={() =>
                   shareMedia(message.media!.url, message.media!.fileName, "")
                 }
@@ -174,7 +120,7 @@ export default function MessageBubble({ message }: { message: ChatMessage }) {
           <p className="whitespace-pre-wrap break-words text-sm text-neutral-800 dark:text-neutral-100">
             {message.text}
           </p>
-          <ShareButton onClick={() => shareText(message.text, message.sender)} />
+          <ShareIconButton onClick={() => shareText(message.text, message.sender)} />
         </div>
       )}
 
