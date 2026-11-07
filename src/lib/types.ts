@@ -25,3 +25,12 @@ export interface ThreadMeta {
   skippedMediaCount: number;
   messagesUrl: string; // Cloudinary URL to messages.json
 }
+
+export interface ShareDoc {
+  ownerUid: string;
+  threadId: string;
+  name: string;
+  participants: string[];
+  messagesUrl: string;
+  createdAt: string; // ISO string
+}

@@ -13,6 +13,13 @@ search, play media, and share.
   thread, inline image/video/audio playback, and a share button on every
   message/media item that uses the device's native share sheet (forward to
   WhatsApp, email, etc.), falling back to download/copy where unsupported.
+- **Dashboard**: selecting a chat opens a summary page first — message/date
+  stats, most active participants, a "Highlights" strip of recently added
+  items, a photo grid, and a videos/voice-notes list — with a button to open
+  the full searchable message view.
+- **Public share links**: from a chat's dashboard, "Share chat" creates an
+  unguessable link that shows that one chat (read-only, no sign-in needed)
+  to anyone who has it. "Stop sharing" revokes it immediately.
 
 ## Why Cloudinary instead of Firebase Storage?
 
@@ -123,6 +130,12 @@ Authorized domains.
 - No backend server or Cloud Functions are required — Firestore security
   rules enforce that each user can only read/write their own metadata, and
   each user's Cloudinary uploads live under their own uid-prefixed folder.
+- A share link (`/share/?id={threadId}`) works by writing a `shares/{threadId}`
+  Firestore document (`src/lib/share.ts`) pointing at that thread's
+  `messages.json`. `firestore.rules` lets anyone read a `shares` doc (the
+  link itself, built from the thread's unguessable ID, is the access
+  control) but only the owning user create/update/delete it. "Stop sharing"
+  deletes the doc, which immediately breaks the link.
 
 ## Known limitations
 
