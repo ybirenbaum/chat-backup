@@ -31,26 +31,26 @@ export default function MessageBubble({ message }: { message: ChatMessage }) {
   }
 
   return (
-    <div className="group my-1 flex flex-col items-start gap-1 rounded-lg bg-white px-3 py-2 shadow-sm dark:bg-neutral-900">
-      <div className="flex w-full items-baseline justify-between gap-3">
-        <span className="text-sm font-semibold text-emerald-700 dark:text-emerald-400">
+    <div className="group my-1 flex min-w-0 flex-col items-start gap-1 rounded-lg bg-white px-3 py-2 shadow-sm dark:bg-neutral-900">
+      <div className="flex w-full min-w-0 items-baseline justify-between gap-3">
+        <span className="min-w-0 truncate text-sm font-semibold text-emerald-700 dark:text-emerald-400">
           {message.sender}
         </span>
-        <span className="text-[11px] text-neutral-400">
+        <span className="flex-shrink-0 text-[11px] text-neutral-400">
           {formatTime(message.timestamp, message.rawTimestamp)}
         </span>
       </div>
 
       {message.media && (
-        <div className="mt-1 flex w-full flex-col gap-1">
+        <div className="mt-1 flex w-full min-w-0 flex-col gap-1">
           {message.media.kind === "image" && (
-            <div className="group/media relative inline-block">
+            <div className="group/media relative">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={message.media.url}
                 alt={message.media.fileName}
                 onClick={() => setExpanded(true)}
-                className="max-h-72 max-w-xs cursor-pointer rounded-md object-cover"
+                className="h-auto max-h-72 w-full max-w-xs cursor-pointer rounded-md object-cover"
               />
               <div className="absolute right-1 top-1">
                 <ShareIconButton
@@ -66,7 +66,7 @@ export default function MessageBubble({ message }: { message: ChatMessage }) {
               <video
                 src={message.media.url}
                 controls
-                className="max-h-72 max-w-xs rounded-md"
+                className="h-auto max-h-72 w-full max-w-xs rounded-md"
               />
               <button
                 onClick={() =>
@@ -87,7 +87,7 @@ export default function MessageBubble({ message }: { message: ChatMessage }) {
           )}
           {message.media.kind === "audio" && (
             <div className="flex items-center gap-2">
-              <audio src={message.media.url} controls className="h-10 max-w-xs" />
+              <audio src={message.media.url} controls className="h-10 w-full min-w-0 max-w-xs" />
               <ShareIconButton
                 onClick={() =>
                   shareMedia(message.media!.url, message.media!.fileName, "")
@@ -96,12 +96,12 @@ export default function MessageBubble({ message }: { message: ChatMessage }) {
             </div>
           )}
           {message.media.kind === "document" && (
-            <div className="flex items-center gap-2 rounded-md bg-neutral-100 px-3 py-2 dark:bg-neutral-800">
+            <div className="flex min-w-0 items-center gap-2 rounded-md bg-neutral-100 px-3 py-2 dark:bg-neutral-800">
               <a
                 href={message.media.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="truncate text-sm text-blue-600 underline dark:text-blue-400"
+                className="min-w-0 flex-1 truncate text-sm text-blue-600 underline dark:text-blue-400"
               >
                 📎 {message.media.fileName}
               </a>
@@ -116,8 +116,8 @@ export default function MessageBubble({ message }: { message: ChatMessage }) {
       )}
 
       {message.text && (
-        <div className="flex w-full items-end justify-between gap-2">
-          <p className="whitespace-pre-wrap break-words text-sm text-neutral-800 dark:text-neutral-100">
+        <div className="flex w-full min-w-0 items-end justify-between gap-2">
+          <p className="min-w-0 flex-1 whitespace-pre-wrap break-words text-sm text-neutral-800 dark:text-neutral-100">
             {message.text}
           </p>
           <ShareIconButton onClick={() => shareText(message.text, message.sender)} />
